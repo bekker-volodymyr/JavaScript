@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="scripts/script.js" defer></script>
+
+</head>
+
+<body>
+
+    <noscript>
+        <div style="color: red; padding: 20px; border: 1px solid red;">
+            <strong>Увага!</strong> Для коректної роботи цього сайту необхідно увімкнути JavaScript у налаштуваннях
+            вашого браузера.
+        </div>
+    </noscript>
+
+    <ul>
+        <li>first element</li>
+        <li>second element
+            <span>child node 1</span>
+            <a href="#">child node 2</a>
+            <p>child node 3</p>
+        </li>
+        <li>third element</li>
+    </ul>
+
+    <p id="p1">Paragraph with id</p>
+
+    <script>
+        alert("Привіт! Твоє навчання йде успішно.");
+
+        let isBoss = confirm("Погодитись віддати всі свої дані?");
+        alert(isBoss);
+
+        let age = Number(prompt("Скільки тобі років?", 18));
+
+        const bigNumber = 9007199254740991n;
+        const anotherBigNumber = BigInt("9007199254740991");
+
+        let num1 = 10;
+        let num2 = 1.4;
+        let num3 = Infinity;
+        let num4 = NaN;
+
+        console.log(typeof num4)
+
+        let name = "Ivan";
+        console.log(`Привіт, ${name}!`);
+
+        let path = String.raw`C:\users\admin\new_file`;
+
+        // var number = 10;
+        // let symbol = 'H';
+        // const text = 'Hello';
+
+        // console.log(number, symbol, text);
+
+        // alert('Hello, world!');
+        // console.log("Hello, world!");
+        // console.warn("Warning!");
+        // console.error("ERROR!!");
+
+    </script>
+
+</body>
+
+</html>
