@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .alert {
+            background-color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <p class="test-paragraph">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias sunt, optio esse excepturi
+        libero suscipit architecto tenetur laborum reiciendis nemo enim! Amet omnis rem perspiciatis in sit facere
+        quibusdam placeat.</p>
+
+    <p class="test-paragraph">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Natus voluptatem perspiciatis
+        cum, praesentium nihil sit minima laudantium, aperiam voluptas minus ea possimus eum? Eos aliquid tempora
+        blanditiis quibusdam et maxime!</p>
+
+    <div id="container">
+        <p>Lorem ipsum dolor sit amet.</p>
+    </div>
+
+    <button onclick="addElement()">Create Element</button>
+
+    <input type="text" id="remove-selector" placeholder="div, .class-selector, #id-selector">
+    <button onclick="removeElementsFromPage()">Remove</button>
+
+    <script>
+        document.addEventListener('mouseup', function () {
+            // Отримуємо об'єкт виділення
+            const selection = window.getSelection();
+
+            // Перетворюємо його на звичайний рядок
+            const selectedText = selection.toString();
+
+            if (selectedText.length > 0) {
+                console.log('Ви виділили:', selectedText);
+            }
+        });
+
+        document.title = 'Lesson 6: Document Object Model';
+        console.log(document.URL);
+
+        {
+            let paragraph = document.querySelector(".test-paragraph");
+            console.log(paragraph);
+
+            let paragraphs = document.querySelectorAll("p");
+            console.log(paragraphs);
+        }
+
+        {
+            let container = document.getElementById("container");
+            console.log(container);
+
+            let paragraphs = document.getElementsByTagName("p");
+            console.log(paragraphs);
+
+            let test_p = document.getElementsByClassName("test-paragraph");
+            console.log(test_p);
+        }
+
+        {
+            let container = document.getElementById("container");
+
+            container.style.background = 'cyan';
+        }
+
+        function addElement() {
+            // Створюємо порожній <div> в пам'яті
+            const newDiv = document.createElement('div');
+            newDiv.textContent = 'Привіт! Я новий елемент.';
+            newDiv.classList.add('alert',);
+            newDiv.id = 'welcome-message';
+
+            const container = document.getElementById("container");
+            container.append(newDiv);
+            container.prepend(newDiv);
+            container.before(newDiv);
+            container.after(newDiv);
+        }
+
+        function removeElementsFromPage() {
+            const selectorInput = document.querySelector('#remove-selector');
+            const selectorsToRemove = selectorInput.value;
+
+            const removeElements = document.querySelectorAll(selectorsToRemove);
+
+            if (removeElements.length === 0) {
+                alert('No such elements on the page!');
+            } else {
+                const count = removeElements.length;
+                removeElements.forEach((e) => e.remove());
+                setTimeout(() => alert(`Removed ${count} elements.`), 1);
+            }
+        }
+    </script>
+</body>
+
+</html>
