@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button onclick="changeColor()">Press Me!</button>
+
+    <p onmouseover="changeColor()">Lorem ipsum dolor sit amet.</p>
+
+    <button id="btnToggleTheme">Toggle Theme</button>
+
+    <ul id="pressed-keys">
+    </ul>
+
+    <script>
+        const form = document.querySelector('#myForm');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            console.log('Форму відправлено через JavaScript, без перезавантаження!');
+        });
+
+        const body = document.querySelector('body');
+        body.addEventListener('keydown', (event) => {
+            const list = document.querySelector('#pressed-keys');
+            const listItem = document.createElement('li');
+            listItem.innerText = event.key;
+            list.append(listItem);
+        });
+
+        const ul = document.querySelector('#pressed-keys');
+        ul.addEventListener('click', (event) => {
+            if (event.target !== ul) {
+                event.target.remove();
+            }
+        });
+
+        const btnToggleTheme = document.querySelector('#btnToggleTheme');
+        btnToggleTheme.addEventListener('click', changeColor);
+
+        function changeColor() {
+            const body = document.querySelector('body');
+            body.style.backgroundColor = body.style.backgroundColor === 'black' ? 'white' : 'black';
+        }
+    </script>
+</body>
+
+</html>
