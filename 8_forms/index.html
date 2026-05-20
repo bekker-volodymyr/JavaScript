@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .drop-zone {
+            max-width: 400px;
+            height: 200px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: sans-serif;
+            font-weight: 500;
+            font-size: 18px;
+            cursor: pointer;
+            color: #888;
+            border: 4px dashed #ccc;
+            border-radius: 10px;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        /* Стан, коли файл тримають над зоною */
+        .drop-zone--over {
+            border-color: #007bff;
+            background-color: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <form action="/update-profile" method="POST">
+        <!-- Користувач бачить і змінює це: -->
+        <input type="text" name="username" value="Ivan">
+
+        <!-- Користувач цього не бачить, але сервер це отримає: -->
+        <input type="hidden" name="user_id" value="8472">
+
+        <input type="checkbox" name="interests[]" value="music"> Музика
+        <input type="checkbox" name="interests[]" value="sports"> Спорт
+
+        <p>Виберіть спосіб доставки:</p>
+
+        <input type="radio" id="delivery-nova" name="delivery" value="nova_poshta">
+        <label for="delivery-nova">Нова Пошта</label>
+
+        <input type="radio" id="delivery-ukr" name="delivery" value="ukrposhta">
+        <label for="delivery-ukr">Укрпошта</label>
+
+        <label for="car-brand">Оберіть марку авто:</label>
+        <select name="brand" id="car-brand">
+            <option value="toyota">Toyota</option>
+            <option value="bmw">BMW</option>
+            <option value="audi">Audi</option>
+        </select>
+
+        <select name="city" required>
+            <!-- Цей пункт вибраний за замовчуванням, але його не можна вибрати знову -->
+            <option value="" disabled selected>-- Оберіть ваше місто --</option>
+            <option value="kyiv">Київ</option>
+            <option value="lviv">Львів</option>
+        </select>
+
+        <select name="languages[]" multiple size="4">
+            <option value="ua">Українська</option>
+            <option value="en">Англійська</option>
+            <option value="es">Іспанська</option>
+            <option value="fr">Французька</option>
+        </select>
+
+        <select name="food">
+            <optgroup label="Фрукти">
+                <option value="apple">Яблуко</option>
+                <option value="banana">Банан</option>
+            </optgroup>
+            <optgroup label="Овочі">
+                <option value="carrot">Морква</option>
+                <option value="tomato">Помідор</option>
+            </optgroup>
+        </select>
+
+        <button type="submit">Зберегти</button>
+    </form>
+
+    <form action="/" method="post">
+        <label for="username">Username: </label>
+        <input type="text" placeholder="Enter your username" id="username" name="username" minlength="3" maxlength="15"
+            pattern="[a-zA-Z0-9]+" autocomplete="off" spellcheck="false" required>
+        <label for="password">Password: </label>
+        <input type="password" name="password" id="password">
+        <textarea name="comment">Це текст, який користувач побачить у полі одразу.</textarea>
+        <button type="submit">Submit</button>
+        <button type="reset">Reset</button>
+    </form>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="avatar">
+        <button type="submit">Завантажити</button>
+    </form>
+
+    <div class="drop-zone" id="drop-zone">
+        <span class="drop-zone__prompt">Перетягніть файл сюди або натисніть для вибору</span>
+
+        <!-- Прихований інпут -->
+        <input type="file" name="myFile" id="file-input" hidden>
+    </div>
+
+    <button id="press-me">Press me!</button>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const promptText = dropZone.querySelector('.drop-zone__prompt');
+
+        // 1. Клік по блоку імітує клік по прихованому інпуту
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 2. БЛОКУВАННЯ ВІДКРИТТЯ ФАЙЛУ БРАУЗЕРОМ
+        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, event => {
+                event.preventDefault(); // Зупиняємо стандартну поведінку
+            });
+        });
+
+        // 3. Додаємо візуальний ефект при наведенні
+        dropZone.addEventListener('dragover', () => {
+            dropZone.classList.add('drop-zone--over');
+        });
+
+        // Забираємо ефект, якщо курсор з файлом пішов за межі зони
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drop-zone--over');
+        });
+
+        // 4. ОБРОБКА КИДАННЯ ФАЙЛУ (DROP)
+        dropZone.addEventListener('drop', event => {
+            dropZone.classList.remove('drop-zone--over'); // Забираємо колір
+
+            // В об'єкті event.dataTransfer.files лежать файли, які кинув юзер
+            if (event.dataTransfer.files.length) {
+                // Фішка: ми просто перезаписуємо файли в нашому прихованому <input>
+                fileInput.files = event.dataTransfer.files;
+
+                // Оновлюємо текст, щоб юзер бачив, що він завантажив
+                updatePrompt(fileInput.files[0].name);
+            }
+        });
+
+        // 5. Оновлення тексту, якщо юзер вибрав файл кліком, а не перетягуванням
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) {
+                updatePrompt(fileInput.files[0].name);
+            }
+        });
+
+        // Допоміжна функція для зміни тексту підказки
+        function updatePrompt(text) {
+            promptText.textContent = `Вибрано: ${text}`;
+        }
+
+        function getRandomColor() {
+            const min = 0;
+            const max = 255;
+            const red = Math.floor(Math.random() * (max - min + 1)) + min;
+            const green = Math.floor(Math.random() * (max - min + 1)) + min;
+            const blue = Math.floor(Math.random() * (max - min + 1)) + min;
+            return `rgb(${red}, ${green}, ${blue})`;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.querySelector('form');
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();
+
+                // Збираємо всі дані (тут якраз враховуються всі name)
+                const formData = new FormData(form);
+
+                // Відправляємо асинхронно через fetch
+                fetch('/api/submit', { method: 'POST', body: formData });
+            });
+
+            const button = document.getElementById("press-me");
+            button.addEventListener("click", (event) => {
+                event.target.style.backgroundColor = getRandomColor();
+            })
+        });
+    </script>
+</body>
+
+</html>
