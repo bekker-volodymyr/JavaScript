@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        form {
+            border: solid black 1px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+
+            padding: 0.6em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <form action="#">
+        <div>
+            <label for="email-input">E-mail:</label>
+            <input type="text" name="email" id="email-input">
+            <p id="feedback" hidden></p>
+        </div>
+    </form>
+
+    <script>
+        document.cookie = "session_id=12345; path=/";
+        // Без вказання expires/max-age кука стане сесійною
+
+        // Кука житиме рівно 30 днів (30 * 24 * 60 * 60 секунд)
+        document.cookie = "user_pref=dark_mode; path=/; max-age=2592000";
+
+        document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const input = document.getElementById('email-input');
+            const feedback = document.getElementById('feedback');
+
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+
+                feedback.hidden = false;
+
+                // Якщо поле пусте — можна не показувати помилку
+                if (value === "") {
+                    feedback.hidden = true;
+                    feedback.textContent = "";
+                    return;
+                }
+
+                // Перевірка
+                if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                    feedback.textContent = "Email коректний";
+                    feedback.style.color = "green";
+                } else {
+                    feedback.textContent = "Будь ласка, введіть дійсний email";
+                    feedback.style.color = "red";
+                }
+            });
+        });
+
+        const regex = /abc/;
+        const pattern = new RegExp('abc');
+
+        const fileData = "Level_01_Config_v2.json; size: 1024kb; date: 2026-05-21";
+
+        console.log(/v\d/.test(fileData)); // true
+        console.log(/(\d+)kb/.exec(fileData)); // ['1024kb', '1024', index: 27, ...] (повертає весь збіг і окремо число)
+
+        // Знаходимо всі числа в рядку
+        console.log(fileData.match(/\d+/g));
+
+        // Приховуємо розмір файлу
+        console.log(fileData.replace(/\d+kb/, "HIDDEN"));
+
+        // Розділяємо рядок за допомогою крапки з комою та можливого пробілу після неї
+        console.log(fileData.split(/;\s*/));
+
+        // Шукаємо, з якого символу починається слово "date"
+        console.log(fileData.search(/date/));
+    </script>
+</body>
+
+</html>
