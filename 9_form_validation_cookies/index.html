@@ -84,6 +84,14 @@
 
         // Шукаємо, з якого символу починається слово "date"
         console.log(fileData.search(/date/));
+
+        localStorage.setItem("username", "Олексій");
+        localStorage.setItem("theme", "dark");
+        const userTheme = localStorage.getItem("theme");
+        console.log(userTheme); // Виведе: "dark"
+        localStorage.removeItem("username");
+        localStorage.clear();
+        
     </script>
 </body>
 

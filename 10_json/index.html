@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        // const user = {
+        //     firstName: "Олег",
+        //     age: 25,
+        //     isActive: true,
+        //     // Ця функція буде проігнорована при серіалізації!
+        //     sayHello: function () { console.log("Привіт"); },
+        //     // undefined також зникає
+        //     secretFeature: undefined
+        // };
+
+        // Перетворюємо об'єкт на рядок
+        // const jsonString = JSON.stringify(user);
+
+        // console.log(jsonString);
+        // Виведе рядок: '{"firstName":"Олег","age":25,"isActive":true}'
+
+        // Уявімо, що цей рядок тексту прийшов від сервера
+        const jsonFromServer = '{"name": "Анна", "role": "admin", "skills": ["JS", "React"]}';
+
+        // З рядка тексту ми нічого не можемо дістати.
+        // Перетворюємо (парсимо) текст на реальний об'єкт:
+        const parsedData = JSON.parse(jsonFromServer);
+
+        // Тепер ми можемо працювати з цим як із звичайним JS-об'єктом!
+        console.log(parsedData.name); // Виведе: Анна
+        console.log(parsedData.skills[1]); // Виведе: React
+
+        const badJsonText = '{"name": "Іван", }'; // Зайва кома в кінці — це помилка в JSON
+
+        try {
+            const data = JSON.parse(badJsonText);
+        } catch (error) {
+            console.log("Обережно! Сервер надіслав поламаний JSON:", error.message);
+        }
+
+        // 1. НАШІ ДАНІ (Об'єкт)
+        const userSettings = {
+            volume: 80,
+            notifications: true,
+            language: "uk"
+        };
+
+        // 2. ЗБЕРЕЖЕННЯ
+        // Спочатку серіалізуємо об'єкт у JSON-рядок, потім кладемо в сховище
+        localStorage.setItem("settings", JSON.stringify(userSettings));
+
+        // 3. ЧИТАННЯ (з перевіркою та захистом)
+        const savedString = localStorage.getItem("settings");
+
+        if (savedString) { // Перевіряємо, чи взагалі є щось у сховищі
+            try {
+                // Парсимо JSON назад у JS-об'єкт
+                const parsedSettings = JSON.parse(savedString);
+                console.log("Гучність:", parsedSettings.volume);
+            } catch (error) {
+                console.log("❌ Хтось пошкодив дані в localStorage!", error.message);
+                // Якщо дані зламані, можна їх очистити
+                localStorage.removeItem("settings");
+            }
+        }
+
+        const user = {
+            firstName: "Іван",
+            lastName: "Франко",
+            age: 30,
+            passwordHash: "super_secret_hash_123",
+            creditCard: "4111-1111-1111-1111",
+
+            // Додаємо наш кастомний метод
+            toJSON() {
+                // Повертаємо лише те, що безпечно показувати зовні.
+                // Можна навіть створювати нові поля на льоту!
+                return {
+                    fullName: `${this.firstName} ${this.lastName}`,
+                    age: this.age,
+                    role: "customer"
+                };
+            }
+        };
+
+        // Викликаємо стандартний stringify
+        const jsonString = JSON.stringify(user);
+
+        console.log(jsonString);
+        // Результат: '{"fullName":"Іван Франко","age":30,"role":"customer"}'
+    </script>
+</body>
+
+</html>

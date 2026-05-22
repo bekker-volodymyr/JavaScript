@@ -1,0 +1,26 @@
+{
+    "missionId": "ARES-2026",
+    "missionName": "Марсіанський світанок",
+    "launchYear": 2026,
+    "isManned": true,
+    "status": "У польоті",
+    "budgetBillion": 2.5,
+    "commander": {
+        "firstName": "Катерина",
+        "lastName": "Зоряна",
+        "rank": "Капітан"
+    },
+    "crewRoles": [
+        "Пілот",
+        "Бортінженер",
+        "Астробіолог",
+        "Медик"
+    ],
+    "telemetry": {
+        "speedKmh": 27500,
+        "distanceTravelledKm": 15000000,
+        "systemsCheck": "OK"
+    },
+    "criticalErrors": null,
+    "communicationActive": true
+}

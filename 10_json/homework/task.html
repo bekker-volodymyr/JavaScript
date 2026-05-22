@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Reader</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .upload-container {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        input[type="file"] {
+            font-size: 16px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            width: 30%;
+        }
+
+        /* Стиль для вкладених об'єктів у таблиці */
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            color: #0066cc;
+        }
+
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Переглядач JSON-файлів</h2>
+
+    <div class="upload-container">
+        <!-- Атрибут accept обмежує вибір лише JSON файлами -->
+        <input type="file" id="jsonInput" accept=".json, application/json">
+        <div id="errorMsg" class="error"></div>
+    </div>
+
+    <table id="resultTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Поле (Ключ)</th>
+                <th>Значення</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <script>
+        const fileInput = document.getElementById('jsonInput');
+        const table = document.getElementById('resultTable');
+        const tableBody = document.getElementById('tableBody');
+        const errorMsg = document.getElementById('errorMsg');
+
+        // Слухаємо подію вибору файлу
+        fileInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+
+            // Очищуємо інтерфейс перед новим файлом
+            table.style.display = 'none';
+            tableBody.innerHTML = '';
+            errorMsg.textContent = '';
+
+            if (!file) return;
+
+            // Створюємо об'єкт для читання файлу
+            const reader = new FileReader();
+
+            // Що робити, коли файл успішно прочитано
+            reader.onload = function (e) {
+                try {
+                    // e.target.result містить текст файлу. Парсимо його!
+                    const jsonData = JSON.parse(e.target.result);
+                    renderTable(jsonData);
+                } catch (error) {
+                    // Ловимо помилку, якщо файл виявився невалідним
+                    errorMsg.textContent = `❌ Помилка: Файл містить невалідний JSON. Деталі: ${error.message}`;
+                }
+            };
+
+            // Запускаємо процес читання файлу як тексту
+            reader.readAsText(file);
+        });
+
+        // Функція для побудови рядків таблиці
+        function renderTable(data) {
+            // Якщо в JSON лежить масив, для таблиці ми візьмемо перший об'єкт з нього
+            const targetData = Array.isArray(data) ? data[0] : data;
+
+            // Захист від базових типів (якщо в JSON просто число чи рядок)
+            if (typeof targetData !== 'object' || targetData === null) {
+                errorMsg.textContent = '❌ Структура JSON не є об\'єктом, неможливо побудувати таблицю.';
+                return;
+            }
+
+            // Перебираємо всі ключі в об'єкті
+            for (const key in targetData) {
+                const tr = document.createElement('tr');
+
+                // Комірка для ключа
+                const tdKey = document.createElement('td');
+                tdKey.textContent = key;
+
+                // Комірка для значення
+                const tdValue = document.createElement('td');
+                const value = targetData[key];
+
+                // Якщо всередині лежить інший об'єкт чи масив, красиво перетворюємо його на текст
+                if (typeof value === 'object' && value !== null) {
+                    const pre = document.createElement('pre');
+                    pre.textContent = JSON.stringify(value, null, 2);
+                    tdValue.appendChild(pre);
+                } else {
+                    tdValue.textContent = String(value);
+                }
+
+                tr.appendChild(tdKey);
+                tr.appendChild(tdValue);
+                tableBody.appendChild(tr);
+            }
+
+            // Показуємо готову таблицю
+            table.style.display = 'table';
+        }
+    </script>
+</body>
+
+</html>
