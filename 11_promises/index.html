@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        // Звичайна функція
+        function greet(name) {
+            console.log('Привіт, ' + name);
+        }
+        greet('Олексій');
+
+        // Callback функція
+        function processUserInput(callback) {
+            const name = 'Олексій';
+            // Виклик функції, яку передали як аргумент
+            callback(name);
+        }
+
+        processUserInput(greet);
+
+        const myPromise = new Promise((resolve, reject) => {
+            // Імітація асинхронної задачі
+            setTimeout(() => {
+                const isSuccess = true;
+
+                if (isSuccess) { // Переводить у стан Fulfilled
+                    resolve("Операція успішна!");
+                } else { // Переводить у стан Rejected
+                    reject("Сталася помилка.");
+                }
+            }, 1000);
+        });
+
+        myPromise
+            .then((result) => {
+                console.log(result); // Виведе: "Операція успішна!"
+            })
+            .catch((error) => {
+                console.error(error); // Виконається, якщо буде reject
+            });
+
+        new Promise((resolve) => {
+            resolve(2);
+        })
+            .then((num) => {
+                console.log(num); // 2
+                return num * 2;
+            })
+            .then((num) => {
+                console.log(num); // 4
+                return num * 2;
+            })
+            .then((num) => {
+                console.log(num); // 8
+            });
+
+        new Promise((resolve, reject) => {
+            resolve("Крок 1 пройдено");
+        })
+            .then((res) => {
+                console.log(res);
+                throw new Error("Щось пішло не так на кроці 2!"); // Генеруємо помилку
+            })
+            .then(() => {
+                console.log("Цей код ніколи не виконається");
+            })
+            .catch((err) => {
+                console.error("Перехоплено:", err.message); // Перехоплено: Щось пішло не так на кроці 2!
+            });
+
+        const fetchUserData = new Promise((resolve) => setTimeout(() => resolve({ name: "Іван" }), 1000));
+        const fetchUserFriends = new Promise((resolve) => setTimeout(() => resolve(["Олена", "Петро"]), 2000));
+
+        // Чекаємо завершення обох промісів. Загальний час виконання складе ~2 секунди (за часом найдовшого).
+        Promise.all([fetchUserData, fetchUserFriends])
+            .then((results) => {
+                const [userData, friends] = results; // Деструктуризація масиву результатів
+                console.log("Promise.all виконано!");
+                console.log("Користувач:", userData.name);
+                console.log("Друзі:", friends);
+            })
+            .catch((error) => {
+                // Якщо хоча б один проміс завершиться з помилкою (reject), 
+                // спрацює цей catch, і ми не отримаємо жодних результатів.
+                console.error("Помилка завантаження даних:", error);
+            });
+
+        // Імітуємо запит, який завис і виконується занадто довго (5 секунд)
+        const slowRequest = new Promise((resolve) => setTimeout(() => resolve("Дані з сервера отримано"), 5000));
+
+        // Створюємо проміс-таймаут, який відхиляється через 3 секунди
+        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Час очікування вийшов!")), 3000));
+
+        // Запускаємо їх паралельно. Переможе той, хто завершиться першим.
+        Promise.race([slowRequest, timeout])
+            .then((data) => {
+                console.log(data); // Це не виконається, бо таймаут спрацює швидше
+            })
+            .catch((error) => {
+                console.error("Promise.race результат:", error.message); // Виведе: "Час очікування вийшов!"
+            });
+
+        const uploadPhoto1 = new Promise((resolve) => setTimeout(() => resolve("Фото 1 успішно завантажено"), 1000));
+        const uploadPhoto2 = new Promise((_, reject) => setTimeout(() => reject("Помилка: файл пошкоджено"), 1500));
+        const uploadPhoto3 = new Promise((resolve) => setTimeout(() => resolve("Фото 3 успішно завантажено"), 2000));
+
+        Promise.allSettled([uploadPhoto1, uploadPhoto2, uploadPhoto3])
+            .then((results) => {
+                console.log("Promise.allSettled завершився. Звіт:");
+
+                results.forEach((result, index) => {
+                    if (result.status === "fulfilled") {
+                        console.log(`Проміс ${index + 1}: Успіх - ${result.value}`);
+                    } else {
+                        console.log(`Проміс ${index + 1}: Провал - ${result.reason}`);
+                    }
+                });
+            });
+        /*
+        Вивід:
+        Проміс 1: Успіх - Фото 1 успішно завантажено
+        Проміс 2: Провал - Помилка: файл пошкоджено
+        Проміс 3: Успіх - Фото 3 успішно завантажено
+        */
+
+        // Імітуємо сервери
+        const server1 = new Promise((_, reject) => setTimeout(() => reject("Сервер 1 впав (500)"), 500));
+        const server2 = new Promise((_, reject) => setTimeout(() => reject("Сервер 2 недоступний (404)"), 1000));
+        const server3 = new Promise((resolve) => setTimeout(() => resolve("Сервер 3 віддав дані!"), 1500));
+
+        // Promise.any ігнорує reject'и від server1 та server2, і чекає на успіх від server3
+        Promise.any([server1, server2, server3])
+            .then((firstSuccessfulData) => {
+                console.log("Promise.any результат:", firstSuccessfulData); // Виведе: "Сервер 3 віддав дані!"
+            })
+            .catch((aggregateError) => {
+                // Цей catch спрацює ТІЛЬКИ якщо всі сервери впадуть
+                console.error("Усі сервери лягли:", aggregateError.errors);
+            });
+    </script>
+</body>
+
+</html>

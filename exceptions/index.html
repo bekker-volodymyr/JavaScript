@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        try {
+            console.log("Початок блоку try");
+
+            // Звертаємось до неіснуючої змінної, що викличе помилку
+            console.log(unresolvedVariable);
+
+            console.log("Цей рядок ніколи не виконається, бо сталася помилка вище");
+        } catch (error) {
+            console.log("Сталася помилка! Але скрипт не впав, ми її спіймали.");
+        }
+
+        console.log("Скрипт продовжує свою роботу далі...");
+
+        try {
+            lalala; // Помилка: змінна не визначена
+        } catch (err) {
+            console.error("Ім'я помилки:", err.name);       // ReferenceError
+            console.error("Повідомлення:", err.message);    // lalala is not defined
+        }
+
+        const user = { name: "Іван", age: -5 };
+
+        try {
+            if (user.age < 0) {
+                // Штучно викидаємо помилку. Виконання try негайно зупиняється.
+                throw new Error("Вік не може бути від'ємним!");
+            }
+            console.log("Користувач валідний");
+        } catch (err) {
+            console.log("Помилка валідації:", err.message); // Виведе: "Помилка валідації: Вік не може бути від'ємним!"
+        }
+
+        let isLoading = true;
+        console.log("Показуємо спінер завантаження...");
+
+        try {
+            console.log("Спроба отримати дані...");
+            throw new Error("Сервер не відповідає"); // Імітація помилки
+        } catch (err) {
+            console.log("Обробили помилку:", err.message);
+        } finally {
+            isLoading = false;
+            console.log("Ховаємо спінер завантаження."); // Виконається у будь-якому випадку
+        }
+
+        try {
+            setTimeout(() => {
+                throw new Error("Цю помилку try/catch НЕ зловить!"); // Скрипт впаде
+            }, 1000);
+        } catch (err) {
+            console.log("Спіймали?"); // Ні, цей код не виконається
+        }
+
+        setTimeout(() => {
+            try {
+                throw new Error("Тепер ми зловимо цю помилку!");
+            } catch (err) {
+                console.log("Спіймано всередині таймауту:", err.message);
+            }
+        }, 1000);
+    </script>
+</body>
+
+</html>
