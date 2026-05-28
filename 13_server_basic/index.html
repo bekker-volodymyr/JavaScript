@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <h2>Реєстрація користувача</h2>
+
+    <form id="registrationForm">
+        <div>
+            <label for="userName">Ім'я:</label>
+            <input type="text" id="userName" name="username" required>
+        </div>
+        <br>
+        <div>
+            <label for="userEmail">Email:</label>
+            <input type="email" id="userEmail" name="email" required>
+        </div>
+        <br>
+        <button type="submit">Відправити дані</button>
+    </form>
+
+    <div id="resultMessage" style="margin-top: 15px; color: green;"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Знаходимо форму та елемент для виводу повідомлень
+            const form = document.getElementById('registrationForm');
+            const resultMessage = document.getElementById('resultMessage');
+
+            // 2. Вішаємо обробник події 'submit' на форму
+            form.addEventListener('submit', function (event) {
+                // ЗУПИНЯЄМО стандартну поведінку (перезавантаження сторінки)
+                event.preventDefault();
+
+                // 3. Збираємо дані за допомогою FormData
+                // Передаємо саму форму (this або form) як аргумент
+                const formData = new FormData(form);
+
+                // Перетворюємо FormData у звичайний JavaScript об'єкт.
+                // formData.entries() повертає пари [ключ, значення], 
+                // а Object.fromEntries робить з них об'єкт { username: "...", email: "..." }
+                const formObject = Object.fromEntries(formData.entries());
+
+                console.log("Зібрані дані для відправки:", formObject);
+
+                // 4. Створюємо та відправляємо XHR запит
+                const xhr = new XMLHttpRequest();
+
+                // Використовуємо тестовий API для демонстрації
+                xhr.open('POST', 'https://jsonplaceholder.typicode.com/users');
+
+                // Вказуємо серверу, що відправляємо JSON
+                xhr.setRequestHeader('Content-Type', 'application/json');
+
+                // Обробник успішної відповіді
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        const responseData = JSON.parse(xhr.response);
+                        console.log("Відповідь сервера:", responseData);
+
+                        // Виводимо повідомлення для користувача та очищаємо форму
+                        resultMessage.textContent = `Успіх! Користувача ${responseData.username} створено (ID: ${responseData.id}).`;
+                        resultMessage.style.color = "green";
+                        form.reset();
+                    } else {
+                        resultMessage.textContent = `Помилка: ${xhr.status}`;
+                        resultMessage.style.color = "red";
+                    }
+                };
+
+                // Обробник помилки мережі
+                xhr.onerror = function () {
+                    resultMessage.textContent = "Помилка мережі. Перевірте з'єднання.";
+                    resultMessage.style.color = "red";
+                };
+
+                // 5. Відправляємо дані, перетворивши об'єкт у JSON-рядок
+                xhr.send(JSON.stringify(formObject));
+            });
+        });
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'https://jsonplaceholder.typicode.com/users');
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                // Обов'язково показати парсинг JSON
+                const data = JSON.parse(xhr.response);
+                console.log("Отримані користувачі:", data);
+            } else {
+                console.error("Помилка запиту:", xhr.status);
+            }
+        };
+        xhr.send();
+
+        // 1. Створюємо об'єкт запиту
+        const post = new XMLHttpRequest();
+
+        // 2. Налаштовуємо: метод POST та URL
+        post.open('POST', 'https://jsonplaceholder.typicode.com/posts');
+
+        // 3. Встановлюємо заголовок (критично важливо для JSON!)
+        // Кажемо серверу: "Чекай від нас словник у форматі JSON"
+        post.setRequestHeader('Content-Type', 'application/json');
+
+        // Дані, які ми хочемо відправити на сервер
+        const newPost = {
+            title: 'Моя нова стаття',
+            body: 'Текст статті...',
+            userId: 1
+        };
+
+        // 4. Описуємо, що робити, коли сервер надішле відповідь
+        post.onload = function () {
+            // Перевіряємо статуси успіху (200 - OK, 201 - Created)
+            if (post.status >= 200 && post.status < 300) {
+                // Сервер успішно отримав дані і зазвичай повертає створений об'єкт (вже з ID)
+                const responseData = JSON.parse(post.response);
+                console.log("Успіх! Сервер створив пост:", responseData);
+            } else {
+                // Запит дійшов до сервера, але сервер відповів помилкою (напр. 400, 404, 500)
+                console.error(`Помилка сервера: ${post.status} ${post.statusText}`);
+            }
+        };
+
+        // 5. Описуємо, що робити при проблемах з мережею (напр., впав інтернет)
+        post.onerror = function () {
+            console.error("Сталася мережева помилка. Запит взагалі не дійшов до сервера.");
+        };
+
+        // 6. Фізична відправка запиту
+        // Обов'язково перетворюємо наш JavaScript-об'єкт у JSON-рядок
+        post.send(JSON.stringify(newPost));
+    </script>
+</body>
+
+</html>
